@@ -88,31 +88,3 @@ str(ndvi_df)
 
 
 
-
-
-
-
-
-#lines(y, col = "red")
-
-# extract values
-df_pixel <- values(ndviStack[1:3])
-v = ndviStack[,, ]
-plot(v, type = "o")
-
-ndviStack$Jan.02.2018
-
-df_pixel <- extract(x = ndviStack[1:3],y = extent(NDVI))
-names(ndviStack)
-
-
-
-
-
-
-
-NDVI <- raster(files[1])
-NDVI2 <- raster(files[9])
-extent(NDVI2) <- extent(NDVI)
-extent(NDVI2)
-dim(NDVI)

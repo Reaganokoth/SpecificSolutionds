@@ -59,12 +59,37 @@ str(ndvi_df$Dates)
 ndvi_df$mean_ndvi_perPixel_perDate <- as.numeric(ndvi_df$mean_ndvi_perPixel_perDate)
 ndvi_df$Dates <- Dates
 
+#subsetting a pixel of interest as follows
+
+# first index is selecting the ndvi values
+# second index the 1st dimension (x)
+# third index is the second dimension (y)
+# 4th index is the 3rd dimension bands in our case the timestamp
+First_pixel_Xdim <-  st_apply(ndvi_stars[,1,,],"band", mean, na.rm = TRUE)[[1]]
+
+#make a data frame
+ndvi_df_Xdim <- cbind(Dates, First_pixel_Xdim) %>% 
+  as.data.frame()
+ndvi_df_Xdim$Dates <- Dates
+str(ndvi_df_Xdim$Dates)
+
+First_pixel_Ydim <- st_apply(ndvi_stars[,,1,], "band", mean, na.rm = TRUE)[[1]]
+#make a data frame
+ndvi_df_Ydim <- cbind(Dates, First_pixel_Ydim) %>% 
+  as.data.frame()
+
+ndvi_df_Ydim$Dates <- Dates
+str(ndvi_df_Ydim$Dates)
+
+combined <- cbind(ndvi_df_Xdim, ndvi_df_Ydim[2])
+
+
 #plot the data
 str(ndvi_df)
  ggplot(ndvi_df, aes(x=Dates)) +
   geom_line( aes(y=mean_ndvi_perPixel_perDate), size=0.5, color= "darkgreen") + # Divide by 10 to get the same range than the temperature
   
-  scale_x_date(date_labels = "%m-%Y",date_breaks = "1 month")+
+  scale_x_date(date_labels = "%m-%b",date_breaks = "1 month")+
   theme_ipsum() +
   theme(
     plot.title = element_text(hjust = 0.5),
@@ -76,6 +101,40 @@ str(ndvi_df)
   ggtitle("NDVI Time Series per Pixel") +
   xlab(label = "Time")+
    ylab(label = "Mean NDVI")
+ 
+ #plot 2
+ 
+ ggplot(combined, aes(x=Dates)) +
+   geom_line( aes(y=First_pixel_Xdim), size=0.5, color= "darkgreen") + 
+   geom_line( aes(y=First_pixel_Ydim), size=0.5, color= "red")+
+   scale_x_date(date_labels = "%d-%b",date_breaks = "1 month")+
+   scale_y_continuous(
+     
+     # Features of the first axis
+     name = "NDVI First Pixel in x-Dimension",
+     
+     # Add a second axis and specify its features
+     sec.axis = sec_axis(~.*1, name="NDVI First Pixel in y-Dimension")
+   ) +
+   theme_ipsum() +
+   theme(
+     axis.title.y = element_text(color = "darkgreen", size=13),
+     axis.title.y.right = element_text(color = "red", size=13),
+     plot.title = element_text(hjust = 0.5),
+     axis.title.x = element_text(hjust = 0.5)
+     
+   ) +
+   
+   ggtitle("NDVI Time Series First Pixel in x and y Dimensions") +
+   xlab(label = "Time")
+   #ylab(label = "Mean NDVI")
+ 
+  
+
+
+
+
+
 
 
 
